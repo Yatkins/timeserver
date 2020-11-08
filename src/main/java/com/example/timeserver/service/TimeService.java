@@ -1,5 +1,6 @@
 package com.example.timeserver.service;
 
+import com.example.timeserver.model.TimeResponse;
 import org.springframework.stereotype.Service;
 
 import java.text.DateFormat;
@@ -16,21 +17,31 @@ public class TimeService {
         return date.toString();
     }
 
-    public String getGMT(){
-        DateFormat dateFormat = new SimpleDateFormat();
-        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return dateFormat.format(dateFormat);
-    }
-
     public Long getEpochTime() {
         Date date = new Date();
         return date.getTime();
     }
 
-    public String getRequestedTimeZoneTime(String zone){
+    public String getTimeZoneTime(String zone){
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSS'Z'ZZZ");
         dateFormat.setTimeZone(TimeZone.getTimeZone(zone));
-        return dateFormat.format(dateFormat);
+        return dateFormat.format(new Date());
+    }
+
+    public TimeResponse getTimeResponse(){
+        Date date = new Date();
+        return TimeResponse.builder()
+                .localTime(date.toString())
+                .epochMillis(date.getTime())
+                .utcTime(getUtcDateFromLocalDate(date))
+                .build();
+    }
+
+    private String getUtcDateFromLocalDate(Date date) {
+        TimeZone zone = TimeZone.getTimeZone("UTC");
+        DateFormat dateFormat = new SimpleDateFormat();
+        dateFormat.setTimeZone(zone);
+        return dateFormat.format(date);
     }
 
 }
